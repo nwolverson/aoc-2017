@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "install": "curl -L https://raw.githubusercontent.com/ngn/apl/master/apl.js -o apl.js",
+        "start": "node apl.js answer.apl"
+    }
+}

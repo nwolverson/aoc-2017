@@ -10,3 +10,6 @@ rowCheck ← {
   } ¨ ⍳⍴ row 
 }
 answer2 ← +/ { rowCheck inp[⍵] } ¨ ⍳(1 ↑ ⍴ inp)
+
+⎕ ← answer1
+⎕ ← answer2
