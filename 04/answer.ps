@@ -544,9 +544,7 @@
     word1 length word2 length eq not { false }
     {
         word1 length 0 eq { true } {
-            word2
-                word1 0 1 getinterval
-                search
+            word2 word1 0 1 getinterval search
             { 
                 exch pop mergestr
                 word1 1 word1 length 1 sub getinterval
