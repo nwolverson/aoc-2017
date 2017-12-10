@@ -1,48 +1,37 @@
-fn answer1() {
-    let mut i = 0;
-    let mut skip = 0;
-    let mut list : Vec<u16> = (0..256).collect();
-    let mut lengths = vec![31,2,85,1,80,109,35,63,98,255,0,13,105,254,128,33];
-    lengths.reverse();
-
+fn round(initial_i: usize, initial_skip: usize, list: &mut Vec<u16>, input: &[u8]) -> (usize, usize) {
+    let mut i = initial_i;
+    let mut skip = initial_skip;
     let len = list.len();
-
-    while let Some(length) = lengths.pop() {
+    for length in input.iter() {
+        let length = *length as usize;
         for j in 0..length/2  {
-            list.swap((i+j) % len, (i + (length - 1 - j)) % len);
+            list.swap((i+j) % len, (i + length - 1 - j) % len);
         }
         i += length + skip;
         skip += 1;
     }
+    (i, skip)
+}
+
+fn answer1() {
+    let mut list : Vec<u16> = (0..256).collect();
+    let lengths = vec![31,2,85,1,80,109,35,63,98,255,0,13,105,254,128,33];
+
+    round(0, 0, &mut list, &lengths);
 
     println!("{}", list[0] * list[1]);
 }
 fn answer2() {
     let mut input : Vec<u8> = "31,2,85,1,80,109,35,63,98,255,0,13,105,254,128,33".as_bytes().to_vec();
     input.append(&mut vec![17, 31, 73, 47, 23]);
-
-    // TODO copied
-    let mut i : usize = 0;
-    let mut skip : usize = 0;
     let mut list : Vec<u16> = (0..256).collect();
 
-    for _round in 0..64 {
-        for input_index in 0..input.len() {
-            let length = input[input_index] as usize;
-            // TODO copied
-            for j in 0..length/2  {
-                let len = list.len();
-                list.swap((i+j) % len, (i + length - 1 - j) % len);
-            }
-            i += length + skip;
-            skip += 1;
-        }
+    let mut counters = (0, 0);
+    for _ in 0..64 {
+        counters = round(counters.0, counters.1, &mut list, &input);
     }
 
-    let mut hash : Vec<u16> = Vec::new();
-    for chunk in list.as_slice().chunks(16) {
-        hash.push(chunk.iter().fold(0, |acc, &x| acc ^ x ));
-    }
+    let hash = list.as_slice().chunks(16).map(|chunk| chunk.iter().fold(0, |acc, &x| acc ^ x ));
     for c in hash {
         print!("{:02x}", c)
     }
