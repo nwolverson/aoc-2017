@@ -38,14 +38,54 @@ function answer1(input)
     count
 end
 
+function adjacent(pair)
+    x, y = pair
+    list = []
+    if x > 1
+        push!(list, (x-1, y))
+    end
+    if x < 128
+        push!(list, (x+1, y))
+    end
+    if y > 1
+        push!(list, (x, y-1))
+    end
+    if y < 128
+        push!(list, (x, y+1))
+    end
+    list
+end
+
 function answer2(input)
-    bytes = map(row ->
-#        mapreduce(x -> digits(x, 2, 8), vcat, 
-            hash(convert(Array{UInt8},"$input-$row")), [1:127;])
-    bitarray = map(row -> mapreduce(by -> digits(by, 2, 8), vcat, row), bytes)
-    println(bitarray[1][1])
-    bitarray
+    bytes = map(row -> hash(convert(Array{UInt8},"$input-$row")), [0:127;])
+
+    # println(mapreduce(by -> reverse(digits(by, 2, 8)), vcat, bytes[1]))
+
+    bitarray = map(row -> mapreduce(by -> reverse(digits(by, 2, 8)), vcat, row), bytes)
+
+    function markgroup(start)
+        # Not booleans
+        isgroup = bitarray[start[1]][start[2]] == 1
+        if isgroup
+            bitarray[start[1]][start[2]] = 0
+            for entry in adjacent(start)
+                markgroup(entry)
+            end
+        end
+        isgroup
+    end
+
+
+    groupcount = 0
+    for x in 1:128
+        for y in 1:128
+            if markgroup((x,y))
+                groupcount += 1
+            end
+        end
+    end
+    groupcount
 end
 
 println(answer1("oundnydw"))
-println(typeof(answer2("flqrgnkx")))
+println(answer2("oundnydw"))
