@@ -46,6 +46,15 @@ Object subclass: Env [
         muls := muls + 1.
     ]
     muls [ ^muls ]
+
+    printOn: stream [
+        <category: 'printing'>
+        super printOn: stream.
+        stream nextPutAll: 'pc: '.
+        pc printOn: stream.
+        stream nextPutAll: ', env: '.
+        env printOn: stream.
+    ]
 ]
 
 Object subclass: Instr [
@@ -141,8 +150,23 @@ file linesDo: [:line |
 instructions := instructions select: [:x | x notNil ].
 env := Env new.
 
+
+"Part 1"
 [env validPc: (instructions size)] whileTrue:
     [ 
         (instructions at: (env pc)) invoke: env.
     ]
 (env muls) printNl.
+
+
+"Part 2"
+count := 0.
+(Interval from: 105700 to: 122700 by: 17) do:
+    [ :candidate | | hits size |
+        hits := (Interval from: 2 to: (candidate sqrt)) collect: [ :x|
+            ( (candidate \\ x) == 0 )
+        ].
+        size := ((hits select: [ :h| h ]) size).
+        (size > 0) ifTrue: [ count := count + 1 ]
+    ].
+count printNl.
